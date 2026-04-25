@@ -779,23 +779,38 @@ async def extract_resource(
     record: ParsedResourceBlock,
     model_name: str,
     high_leverage_markers: list[str],
+    rate_limiter: "RateLimiter | None" = None,
 ) -> ResourceModel:
     prompt = build_prompt(prompt_template, record)
 
     async with semaphore:
-        response = await client.messages.create(
-            model=model_name,
-            max_tokens=2200,
-            tools=[
-                {
-                    "name": "record_resource",
-                    "description": "Return the extracted resource fields as structured JSON.",
-                    "input_schema": RESOURCE_TOOL_SCHEMA,
-                }
-            ],
-            tool_choice={"type": "tool", "name": "record_resource"},
-            messages=[{"role": "user", "content": prompt}],
-        )
+        if rate_limiter is not None:
+            await rate_limiter.wait()
+        attempt = 0
+        while True:
+            try:
+                response = await client.messages.create(
+                    model=model_name,
+                    max_tokens=2200,
+                    tools=[
+                        {
+                            "name": "record_resource",
+                            "description": "Return the extracted resource fields as structured JSON.",
+                            "input_schema": RESOURCE_TOOL_SCHEMA,
+                        }
+                    ],
+                    tool_choice={"type": "tool", "name": "record_resource"},
+                    messages=[{"role": "user", "content": prompt}],
+                )
+                break
+            except Exception as exc:  # noqa: BLE001
+                is_rate_limit = type(exc).__name__ == "RateLimitError" or "429" in str(exc)
+                if is_rate_limit and attempt < 6:
+                    delay = min(60, 5 * (2 ** attempt))
+                    attempt += 1
+                    await asyncio.sleep(delay)
+                    continue
+                raise
 
     extracted = ExtractedResourceModel.model_validate(extract_tool_payload(response))
     return ResourceModel(
@@ -833,12 +848,33 @@ async def extract_resource(
     )
 
 
+class RateLimiter:
+    """Enforce a minimum interval between request starts."""
+
+    def __init__(self, min_interval: float) -> None:
+        self.min_interval = min_interval
+        self._next_allowed = 0.0
+        self._lock = asyncio.Lock()
+
+    async def wait(self) -> None:
+        if self.min_interval <= 0:
+            return
+        async with self._lock:
+            loop = asyncio.get_running_loop()
+            now = loop.time()
+            if now < self._next_allowed:
+                await asyncio.sleep(self._next_allowed - now)
+                now = loop.time()
+            self._next_allowed = now + self.min_interval
+
+
 async def run_extraction(
     records: list[ParsedResourceBlock],
     prompt_template: str,
     model_name: str,
     concurrency: int,
     high_leverage_markers: list[str],
+    min_interval: float = 0.0,
 ) -> list[ResourceModel]:
     if AsyncAnthropic is None:
         raise RuntimeError(
@@ -853,6 +889,7 @@ async def run_extraction(
 
     client = AsyncAnthropic(api_key=api_key)
     semaphore = asyncio.Semaphore(concurrency)
+    rate_limiter = RateLimiter(min_interval)
     tasks = [
         asyncio.create_task(
             extract_resource(
@@ -862,14 +899,23 @@ async def run_extraction(
                 record,
                 model_name,
                 high_leverage_markers,
+                rate_limiter,
             )
         )
         for record in records
     ]
 
     extracted: list[ResourceModel] = []
+    failures = 0
     for task in tqdm(asyncio.as_completed(tasks), total=len(tasks), desc="Extracting"):
-        extracted.append(await task)
+        try:
+            extracted.append(await task)
+        except Exception as exc:  # noqa: BLE001
+            failures += 1
+            print(f"\n[skip] extraction failed: {type(exc).__name__}: {exc}", file=sys.stderr)
+
+    if failures:
+        print(f"\nSkipped {failures} resources due to extraction errors.", file=sys.stderr)
 
     return extracted
 
@@ -944,6 +990,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--prompt", type=Path, default=DEFAULT_PROMPT_PATH)
     parser.add_argument("--concurrency", type=int, default=10)
     parser.add_argument("--limit", type=int, default=0)
+    parser.add_argument("--min-interval", type=float, default=0.0,
+                        help="Minimum seconds between request starts (rate limiting)")
     parser.add_argument("--review-sample-size", type=int, default=30)
     parser.add_argument("--review-seed", type=int, default=42)
     return parser.parse_args()
@@ -976,6 +1024,7 @@ async def async_main() -> int:
         model_name=args.model,
         concurrency=args.concurrency,
         high_leverage_markers=high_leverage_markers,
+        min_interval=args.min_interval,
     )
     deduped = finalize_resources(
         dedupe_resources(extracted),

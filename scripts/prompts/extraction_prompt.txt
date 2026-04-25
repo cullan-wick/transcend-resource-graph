@@ -16,7 +16,7 @@ SUBCATEGORY (already determined): {subcategory}
 
 INSTRUCTIONS:
 - The block may be a full multi-bullet markdown entry, a single bullet entry, or a synthetic row built from a markdown table. Use only the information present in the block plus the category/subcategory context above.
-- If a resource says "any UW student" → all of {undergrad, masters, phd} are eligible.
+- If a resource says "any UW student" → all of {{undergrad, masters, phd}} are eligible.
 - If industries not specified → use ["generalist"].
 - If the category/subcategory clearly indicates a vertical (for example `industry_specific` + `AI / ML`), use the matching industry tag instead of `generalist`.
 - Infer stages from phrases like "idea stage", "MVP", "Series A prep". If ambiguous, tag multiple stages.
