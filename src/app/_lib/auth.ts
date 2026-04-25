@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { isWiscEmail } from "@/lib/utils";
 
@@ -28,9 +28,15 @@ export async function getRouteAppUser(): Promise<RouteAuthResult> {
     return { ok: false, reason: "unauthorized" };
   }
 
-  const email = getSessionEmail(
+  let email = getSessionEmail(
     (sessionClaims as Record<string, unknown> | undefined) ?? null,
   );
+
+  if (!email) {
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+    email = user.primaryEmailAddress?.emailAddress ?? null;
+  }
 
   if (!isWiscEmail(email)) {
     return { ok: false, reason: "wisc_only" };
