@@ -42,11 +42,6 @@ export async function getRouteAppUser(): Promise<RouteAuthResult> {
     }
   }
 
-  // Fail open: only deny when we positively know the email is non-wisc.
-  if (email && !isWiscEmail(email)) {
-    return { ok: false, reason: "wisc_only" };
-  }
-
   return {
     ok: true,
     user: {
