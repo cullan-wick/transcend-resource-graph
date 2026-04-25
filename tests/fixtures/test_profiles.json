@@ -1,0 +1,112 @@
+[
+  {
+    "label": "biotech_phd_mvp_fundraising",
+    "description": "Biotech PhD at MVP stage, fundraising — expect WARF, Badger Tech Foundry, SBIR Phase I, Weinert WAVE.",
+    "profile": {
+      "user_id": "test-1",
+      "email": "biotech_phd@wisc.edu",
+      "created_at": "2026-04-01T00:00:00Z",
+      "updated_at": "2026-04-01T00:00:00Z",
+      "uw_status": "phd",
+      "college": "engineering",
+      "stage": "building_mvp",
+      "industries": ["biotech_health"],
+      "business_model": "biotech_therapeutics",
+      "capital_preference": "open_to_both",
+      "team_status": "has_cofounder",
+      "technical_status": "technical_founder",
+      "time_commitment": "full_time",
+      "primary_bottleneck": "funding",
+      "secondary_bottlenecks": ["ip_patents", "mentorship"],
+      "already_engaged_with": []
+    }
+  },
+  {
+    "label": "undergrad_idea_consumer",
+    "description": "Undergrad solo at idea stage, consumer app — expect D2P Startup Foundations, Transcend Pitch, TEO I-Corps, Weinert courses.",
+    "profile": {
+      "user_id": "test-2",
+      "email": "undergrad_solo@wisc.edu",
+      "created_at": "2026-04-01T00:00:00Z",
+      "updated_at": "2026-04-01T00:00:00Z",
+      "uw_status": "undergrad",
+      "college": "letters_science",
+      "stage": "idea",
+      "industries": ["consumer_d2c"],
+      "business_model": "consumer_d2c",
+      "capital_preference": "open_to_both",
+      "team_status": "solo",
+      "technical_status": "non_technical_seeking_cto",
+      "time_commitment": "part_time",
+      "primary_bottleneck": "customers",
+      "secondary_bottlenecks": ["team", "mentorship"],
+      "already_engaged_with": []
+    }
+  },
+  {
+    "label": "masters_business_saas_vc",
+    "description": "Masters in Business, SaaS MVP, wants VC — expect Burrill, Weinert INSITE, Y Combinator, gener8tor.",
+    "profile": {
+      "user_id": "test-3",
+      "email": "masters_saas@wisc.edu",
+      "created_at": "2026-04-01T00:00:00Z",
+      "updated_at": "2026-04-01T00:00:00Z",
+      "uw_status": "masters",
+      "college": "business",
+      "stage": "building_mvp",
+      "industries": ["enterprise_saas"],
+      "business_model": "saas",
+      "capital_preference": "want_vc",
+      "team_status": "has_cofounder",
+      "technical_status": "hybrid_team",
+      "time_commitment": "full_time",
+      "primary_bottleneck": "funding",
+      "secondary_bottlenecks": ["customers", "mentorship"],
+      "already_engaged_with": []
+    }
+  },
+  {
+    "label": "recent_grad_climate_nondilutive",
+    "description": "Recent grad, climate hardware, non-dilutive focus — expect SBIR, DOE grants, Activate Fellowship, Elemental Excelerator.",
+    "profile": {
+      "user_id": "test-4",
+      "email": "recent_climate@wisc.edu",
+      "created_at": "2026-04-01T00:00:00Z",
+      "updated_at": "2026-04-01T00:00:00Z",
+      "uw_status": "recent_grad",
+      "college": "engineering",
+      "stage": "pre_revenue",
+      "industries": ["climate_cleantech", "hardware_deep_tech"],
+      "business_model": "hardware",
+      "capital_preference": "prefer_non_dilutive",
+      "team_status": "has_cofounder",
+      "technical_status": "technical_founder",
+      "time_commitment": "full_time",
+      "primary_bottleneck": "funding",
+      "secondary_bottlenecks": ["space_facilities", "mentorship"],
+      "already_engaged_with": []
+    }
+  },
+  {
+    "label": "undergrad_cdis_ai_mvp",
+    "description": "Undergrad CDIS, AI/ML, building MVP — expect AI compute credits (Anthropic, OpenAI, Modal), I-Corps, Draper TIF, Transcend events.",
+    "profile": {
+      "user_id": "test-5",
+      "email": "undergrad_ai@wisc.edu",
+      "created_at": "2026-04-01T00:00:00Z",
+      "updated_at": "2026-04-01T00:00:00Z",
+      "uw_status": "undergrad",
+      "college": "cdis",
+      "stage": "building_mvp",
+      "industries": ["ai_ml"],
+      "business_model": "saas",
+      "capital_preference": "open_to_both",
+      "team_status": "has_cofounder",
+      "technical_status": "technical_founder",
+      "time_commitment": "part_time",
+      "primary_bottleneck": "product_technical",
+      "secondary_bottlenecks": ["funding", "customers"],
+      "already_engaged_with": []
+    }
+  }
+]

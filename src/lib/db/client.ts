@@ -46,10 +46,29 @@ export type FeedbackRow = {
 export type Database = {
   public: {
     Tables: {
-      profiles: { Row: ProfileRow; Insert: Partial<ProfileRow>; Update: Partial<ProfileRow> };
-      guides: { Row: GuideRow; Insert: Partial<GuideRow>; Update: Partial<GuideRow> };
-      feedback: { Row: FeedbackRow; Insert: Partial<FeedbackRow>; Update: Partial<FeedbackRow> };
+      profiles: {
+        Row: ProfileRow;
+        Insert: Partial<ProfileRow>;
+        Update: Partial<ProfileRow>;
+        Relationships: [];
+      };
+      guides: {
+        Row: GuideRow;
+        Insert: Partial<GuideRow>;
+        Update: Partial<GuideRow>;
+        Relationships: [];
+      };
+      feedback: {
+        Row: FeedbackRow;
+        Insert: Partial<FeedbackRow>;
+        Update: Partial<FeedbackRow>;
+        Relationships: [];
+      };
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
   };
 };
 

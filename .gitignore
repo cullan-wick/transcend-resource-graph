@@ -11,6 +11,10 @@ next-env.d.ts
 .vscode/
 __pycache__/
 *.pyc
+tsconfig.tsbuildinfo
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# source resource guide (not for public repo)
+data/source/TranscendUW_FounderResourceGuide_2026.md

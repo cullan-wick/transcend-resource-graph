@@ -1,0 +1,33 @@
+You are extracting structured data about a startup resource for UW–Madison student founders.
+
+Given the raw markdown block below, return a JSON object with the extractable Resource fields only. The ingestion pipeline will set `id`, `category`, `subcategory`, `source_coverage`, `verification_flags`, `is_high_leverage_pick`, and `last_reviewed` after your response. Use ONLY values from the controlled vocabularies. If a field is not determinable from the block, use null or an empty array — never invent information.
+
+CONTROLLED VOCABULARIES:
+- stages: idea | customer_discovery | building_mvp | pre_revenue | early_revenue | scaling | fundraising_seed | fundraising_series_a
+- industries: ai_ml | climate_cleantech | biotech_health | consumer_d2c | fintech | hardware_deep_tech | crypto_web3 | gaming | social_impact | enterprise_saas | edtech | generalist
+- affiliation: uw_madison | wisconsin_state | national | global
+- resource_type: funding_equity | funding_grant | funding_loan | pitch_competition | accelerator | incubator | fellowship | software_credit | legal_service | mentorship | community | education_course | education_book | physical_space | talent_platform | event_recurring | media_newsletter
+- business_models: saas | consumer_d2c | marketplace | hardware | biotech_therapeutics | medical_device | deep_tech_research | services | content_media | agnostic
+- capital_type: dilutive | non_dilutive | credits | in_kind | not_applicable
+- bottleneck_tags: funding | customers | team | legal | product_technical | mentorship | ip_patents | space_facilities | awareness
+
+CATEGORY (already determined by section): {category}
+SUBCATEGORY (already determined): {subcategory}
+
+INSTRUCTIONS:
+- The block may be a full multi-bullet markdown entry, a single bullet entry, or a synthetic row built from a markdown table. Use only the information present in the block plus the category/subcategory context above.
+- If a resource says "any UW student" → all of {undergrad, masters, phd} are eligible.
+- If industries not specified → use ["generalist"].
+- If the category/subcategory clearly indicates a vertical (for example `industry_specific` + `AI / ML`), use the matching industry tag instead of `generalist`.
+- Infer stages from phrases like "idea stage", "MVP", "Series A prep". If ambiguous, tag multiple stages.
+- For dollar_value_estimate, use the total available to one winner/applicant, not the program pool. Use null if not applicable (e.g., a community).
+- For bottleneck_tags, pick the 1–3 that this resource primarily helps with.
+- Keep `description`, `what_you_get`, and `how_to_access` grounded in the block. For short entries, concise summaries are fine.
+- Do not split umbrella blocks into multiple resources. Extract exactly the resource named at the top of the block.
+
+RESOURCE BLOCK:
+---
+{resource_block}
+---
+
+Return only valid JSON for the extractable fields. No prose, no markdown fences.
