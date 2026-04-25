@@ -113,7 +113,8 @@ export default function LoginForm() {
           await setSignInActive({ session: result.createdSessionId });
           router.push("/survey");
         } else {
-          setError("Verification incomplete. Please try again.");
+          console.error("Sign-in incomplete:", result);
+          setError(`Sign-in incomplete (status: ${result.status}).`);
         }
       } else {
         if (!signUp || !setSignUpActive) throw new Error("Clerk not ready.");
@@ -122,7 +123,16 @@ export default function LoginForm() {
           await setSignUpActive({ session: result.createdSessionId });
           router.push("/survey");
         } else {
-          setError("Verification incomplete. Please try again.");
+          console.error("Sign-up incomplete:", result);
+          const missing = [
+            ...(result.missingFields ?? []),
+            ...(result.unverifiedFields ?? []),
+          ];
+          setError(
+            missing.length > 0
+              ? `Sign-up incomplete. Clerk requires: ${missing.join(", ")}. Disable these in the Clerk dashboard.`
+              : `Sign-up incomplete (status: ${result.status}).`,
+          );
         }
       }
     } catch (err) {
