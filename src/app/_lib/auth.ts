@@ -33,12 +33,17 @@ export async function getRouteAppUser(): Promise<RouteAuthResult> {
   );
 
   if (!email) {
-    const client = await clerkClient();
-    const user = await client.users.getUser(userId);
-    email = user.primaryEmailAddress?.emailAddress ?? null;
+    try {
+      const client = await clerkClient();
+      const user = await client.users.getUser(userId);
+      email = user.primaryEmailAddress?.emailAddress ?? null;
+    } catch (err) {
+      console.error("[auth] clerkClient lookup failed", err);
+    }
   }
 
-  if (!isWiscEmail(email)) {
+  // Fail open: only deny when we positively know the email is non-wisc.
+  if (email && !isWiscEmail(email)) {
     return { ok: false, reason: "wisc_only" };
   }
 
@@ -46,7 +51,7 @@ export async function getRouteAppUser(): Promise<RouteAuthResult> {
     ok: true,
     user: {
       userId,
-      email: email!,
+      email: email ?? "",
     },
   };
 }

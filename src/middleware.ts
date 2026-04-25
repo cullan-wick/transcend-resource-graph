@@ -17,7 +17,7 @@ export default clerkMiddleware(async (auth, req) => {
     return redirectToSignIn({ returnBackUrl: req.url });
   }
 
-  let email =
+  let email: string | undefined =
     (sessionClaims?.email as string | undefined) ??
     (sessionClaims?.primary_email as string | undefined) ??
     ((sessionClaims as Record<string, unknown> | undefined)?.[
@@ -25,12 +25,17 @@ export default clerkMiddleware(async (auth, req) => {
     ] as string | undefined);
 
   if (!email) {
-    const client = await clerkClient();
-    const user = await client.users.getUser(userId);
-    email = user.primaryEmailAddress?.emailAddress;
+    try {
+      const client = await clerkClient();
+      const user = await client.users.getUser(userId);
+      email = user.primaryEmailAddress?.emailAddress;
+    } catch (err) {
+      console.error("[middleware] clerkClient lookup failed", err);
+    }
   }
 
-  if (!isWiscEmail(email)) {
+  // Fail open: only redirect when we positively know the email is non-wisc.
+  if (email && !isWiscEmail(email)) {
     const url = new URL("/login", req.url);
     url.searchParams.set("error", "wisc_only");
     return NextResponse.redirect(url);

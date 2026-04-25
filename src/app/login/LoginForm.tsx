@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useSignIn, useSignUp } from "@clerk/nextjs";
+import { useSignIn, useSignUp, useUser, useClerk } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { isWiscEmail } from "@/lib/utils";
@@ -15,6 +15,8 @@ export default function LoginForm() {
   const searchParams = useSearchParams();
   const { isLoaded: signInLoaded, signIn, setActive: setSignInActive } = useSignIn();
   const { isLoaded: signUpLoaded, signUp, setActive: setSignUpActive } = useSignUp();
+  const { isSignedIn, user } = useUser();
+  const { signOut } = useClerk();
 
   const [step, setStep] = useState<Step>("email");
   const [mode, setMode] = useState<Mode>("signIn");
@@ -148,6 +150,30 @@ export default function LoginForm() {
     setStep("email");
     setCode("");
     setError(null);
+  }
+
+  if (isSignedIn) {
+    const currentEmail = user?.primaryEmailAddress?.emailAddress ?? "your account";
+    return (
+      <div className="mt-6 space-y-4">
+        <p className="rounded-lg border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
+          You&apos;re already signed in as <strong>{currentEmail}</strong>.
+        </p>
+        <Button onClick={() => router.push("/survey")} className="w-full">
+          Continue to survey
+        </Button>
+        <button
+          type="button"
+          onClick={async () => {
+            await signOut();
+            router.refresh();
+          }}
+          className="text-sm text-muted-foreground underline"
+        >
+          Sign out and use a different email
+        </button>
+      </div>
+    );
   }
 
   if (step === "code") {
