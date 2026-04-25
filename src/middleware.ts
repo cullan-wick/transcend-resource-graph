@@ -1,4 +1,4 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { clerkClient, clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { isWiscEmail } from "@/lib/utils";
 
@@ -17,13 +17,18 @@ export default clerkMiddleware(async (auth, req) => {
     return redirectToSignIn({ returnBackUrl: req.url });
   }
 
-  // Hard server-side @wisc.edu domain gate.
-  const email =
+  let email =
     (sessionClaims?.email as string | undefined) ??
     (sessionClaims?.primary_email as string | undefined) ??
     ((sessionClaims as Record<string, unknown> | undefined)?.[
       "email_address"
     ] as string | undefined);
+
+  if (!email) {
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+    email = user.primaryEmailAddress?.emailAddress;
+  }
 
   if (!isWiscEmail(email)) {
     const url = new URL("/login", req.url);
