@@ -1,7 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import type { PersonalizedGuide, TierEntry } from "@/types/recommendation";
+import type {
+  GuideEntry,
+  PersonalizedGuide,
+  ResourceGroup,
+} from "@/types/recommendation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import ResourceCard from "./ResourceCard";
@@ -12,16 +16,12 @@ type TieredGuideProps = {
   email: string;
 };
 
-function TierSection({
-  title,
-  description,
-  entries,
+function GroupSection({
+  group,
   guideId,
   defaultOpen,
 }: {
-  title: string;
-  description: string;
-  entries: TierEntry[];
+  group: ResourceGroup;
   guideId: string;
   defaultOpen?: boolean;
 }) {
@@ -33,28 +33,25 @@ function TierSection({
       <summary className="cursor-pointer list-none">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-xl font-semibold">{title}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+            <h2 className="text-xl font-semibold">{group.label}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {group.description}
+            </p>
           </div>
           <div className="rounded-full bg-secondary px-3 py-1 text-sm font-medium text-secondary-foreground">
-            {entries.length} resources
+            {group.entries.length}{" "}
+            {group.entries.length === 1 ? "resource" : "resources"}
           </div>
         </div>
       </summary>
       <div className="mt-5 space-y-4">
-        {entries.length > 0 ? (
-          entries.map((entry) => (
-            <ResourceCard
-              key={entry.resource_id}
-              entry={entry}
-              guideId={guideId}
-            />
-          ))
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            No recommendations landed in this tier for the current run.
-          </p>
-        )}
+        {group.entries.map((entry: GuideEntry) => (
+          <ResourceCard
+            key={entry.resource_id}
+            entry={entry}
+            guideId={guideId}
+          />
+        ))}
       </div>
     </details>
   );
@@ -71,6 +68,8 @@ export default function TieredGuide({
   const emailBody = encodeURIComponent(
     `Here is my current Transcend UW founder guide.${pageUrl ? ` ${pageUrl}` : ""}`,
   );
+
+  const groups = guide.groups ?? [];
 
   return (
     <div className="space-y-6">
@@ -99,25 +98,23 @@ export default function TieredGuide({
         </CardContent>
       </Card>
 
-      <TierSection
-        title="Tier 1: Start this week"
-        description="The highest-priority opportunities based on your current stage and bottleneck."
-        entries={guide.tier_1_start_this_week}
-        guideId={guideId}
-        defaultOpen
-      />
-      <TierSection
-        title="Tier 2: Explore this month"
-        description="Strong follow-on options that become more valuable once Tier 1 is underway."
-        entries={guide.tier_2_explore_this_month}
-        guideId={guideId}
-      />
-      <TierSection
-        title="Tier 3: Bookmark for later"
-        description="Useful longer-horizon resources to keep on deck."
-        entries={guide.tier_3_bookmark_for_later}
-        guideId={guideId}
-      />
+      {groups.length === 0 ? (
+        <Card>
+          <CardContent className="p-6 text-sm text-muted-foreground">
+            No resources matched your filters. Try broadening your industry
+            selection or removing already-engaged resources.
+          </CardContent>
+        </Card>
+      ) : (
+        groups.map((group, idx) => (
+          <GroupSection
+            key={group.key}
+            group={group}
+            guideId={guideId}
+            defaultOpen={idx === 0}
+          />
+        ))
+      )}
 
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card px-5 py-4">
         <div>

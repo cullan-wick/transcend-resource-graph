@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { ThumbsDown, ThumbsUp } from "lucide-react";
-import type { TierEntry } from "@/types/recommendation";
+import type { GuideEntry } from "@/types/recommendation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type ResourceCardProps = {
-  entry: TierEntry;
+  entry: GuideEntry;
   guideId: string;
 };
 
@@ -27,7 +27,7 @@ function formatCurrency(value: number) {
   }).format(value);
 }
 
-function getAccessHref(entry: TierEntry): string | null {
+function getAccessHref(entry: GuideEntry): string | null {
   const { resource } = entry;
   if (resource.external_url) return resource.external_url;
 
