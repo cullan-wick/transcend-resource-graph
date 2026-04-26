@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { getRouteAppUser } from "@/app/_lib/auth";
+
+export const runtime = "nodejs";
+export const maxDuration = 60;
 import { runGuidePipeline } from "@/app/_lib/guide-runtime";
 import { type SurveyDraft, toSurveyDraft } from "@/app/_lib/survey";
 import { getSupabaseServerClient } from "@/lib/db/client";
